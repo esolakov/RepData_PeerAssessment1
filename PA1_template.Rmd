@@ -1,0 +1,137 @@
+---
+title: 'Reproducible Research: Peer Assessment 1'
+output:
+  html_document: yes
+    keep_md: yes
+    smart: no
+---
+
+
+## Loading and preprocessing the data
+
+```{r, echo = TRUE}
+    
+setwd("~/GitHub/RepData_PeerAssessment1")    
+activity = read.csv("activity.csv", header=T)   
+library("dplyr", lib.loc="~/R/win-library/3.1")    
+# Create new data set with total number of steps taken per day    
+summary = activity %>% group_by(date) %>% summarize(total=sum(steps, na.rm=TRUE))
+str(summary)
+```
+
+## What is mean total number of steps taken per day?
+
+```{r, echo = TRUE}   
+# Create histogram for total number of steps taken per day
+hist(summary$total)
+```
+
+####mean total number of steps taken per day
+
+```{r, echo = TRUE}
+
+mean(summary$total)
+
+```
+
+
+####median total number of steps taken per day
+
+```{r, echo = TRUE}
+
+median(summary$total)
+
+```
+
+
+## What is the average daily activity pattern?
+
+```{r,echo = TRUE} 
+# Create a new data set with mean steps per interval averaged accross all days
+summary2 = activity %>% group_by(interval) %>%
+            summarize(avg_int = mean(steps, na.rm=TRUE))
+str(summary2)
+
+plot(summary2$interval,summary2$avg_int, type="l")
+```
+
+#### Interval with maximum total steps
+
+```{r,echo = TRUE} 
+ind = which(summary2$avg_int==max(summary2$avg_int))
+summary2$interval[ind]
+```
+
+
+## Imputing missing values
+#### Calculate number of missing values
+
+```{r,echo = TRUE}
+sum(!complete.cases(activity))
+```
+
+
+```{r, echo = TRUE}
+# Imputing missing values
+for (i in 1:length(activity$steps))
+
+        {if (is.na(activity$steps[i])) activity$steps[i] = 
+                  summary2[(summary2$interval==activity$interval[i]),2]}
+# Convert 'list' to 'vector'        
+activity$steps = unlist(activity$steps)
+
+# Create a new dataset with total steps per day from imputed data
+total_steps_imp = activity %>% group_by(date) %>% 
+                  summarize(total=sum(steps, na.rm=TRUE))
+
+hist(total_steps_imp$total)
+
+mean(total_steps_imp$total)
+
+median(total_steps_imp$total)
+
+```
+### Comment
+As expected the mean and median from the inputed data are larger than 
+
+the relevant values from original data with missing values
+
+
+## Are there differences in activity patterns between weekdays and weekends?
+```{r}        
+activity$date = as.Date(activity$date)
+# Create  character vector 'weekdays' 
+activity$weekdays = weekdays( activity$date)
+str( activity)
+# Create logical vector 'weekend'
+activity$weekend = as.logical((activity$weekdays=="Saturday")|(activity$weekdays == "Sunday"))
+str( activity)
+# Convert logical vector 'weekend' to class 'factor'
+activity$weekend = as.factor(activity$weekend)
+str( activity)
+# Assign factor levels' names
+levels(activity$weekend) =c("weekday","weekend")
+
+# Create a new data set with data grouped by "weekday" and "weekend"
+grouped_int_day = activity %>% group_by(interval,weekend) %>% 
+                  summarize(avg_steps=mean(steps))
+
+library("ggplot2", lib.loc="~/R/win-library/3.1")
+g = ggplot(grouped_int_day, aes(interval,avg_steps))
+g = g + geom_line() +facet_grid(.~weekend)
+g = g+xlab("Interval")+ylab("Average number of steps")   ## horizontal grid  
+print(g)
+
+g = g + geom_line() +facet_grid(weekend ~ .)   ## vertical grid
+print(g)
+
+```
+
+### Activity patterns differences between weekdays and weekends
+
+From the plots above it can be seen that for weekdays there is
+a higher maximum for the average number of steps around the
+interval '830' while for the rest of the day a higher average 
+activity takes place during the weekends. 
+
+

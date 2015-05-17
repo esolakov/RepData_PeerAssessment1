@@ -69,7 +69,9 @@ summary2$interval[ind]
 ```{r,echo = TRUE}
 sum(!complete.cases(activity))
 ```
+### Imputing missing values strategy
 
+Missing values for each interval in the original data set will be replaced with the relevant average value for that interval calculated from the original data and stored in data set "summary2".
 
 ```{r, echo = TRUE}
 # Imputing missing values

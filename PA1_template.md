@@ -1,10 +1,4 @@
----
-title: 'Reproducible Research: Peer Assessment 1'
-output:
-  html_document: yes
-    keep_md: yes
-    smart: no
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
@@ -14,6 +8,22 @@ output:
 setwd("~/GitHub/RepData_PeerAssessment1")    
 activity = read.csv("activity.csv", header=T)   
 library("dplyr", lib.loc="~/R/win-library/3.1")    
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 # Create new data set with total number of steps taken per day    
 summary = activity %>% group_by(date) %>% summarize(total=sum(steps, na.rm=TRUE))
 str(summary)
@@ -34,7 +44,7 @@ str(summary)
 hist(summary$total)
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
 
 ####mean total number of steps taken per day
 
@@ -81,7 +91,7 @@ str(summary2)
 plot(summary2$interval,summary2$avg_int, type="l")
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
 
 #### Interval with maximum total steps
 
@@ -107,7 +117,9 @@ sum(!complete.cases(activity))
 ```
 ## [1] 2304
 ```
+### Imputing missing values strategy
 
+Missing values for each interval in the original data set will be replaced with the relevant average value for that interval calculated from the original data and stored in data set "summary2".
 
 
 ```r
@@ -126,7 +138,7 @@ total_steps_imp = activity %>% group_by(date) %>%
 hist(total_steps_imp$total)
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
 
 ```r
 mean(total_steps_imp$total)
@@ -211,14 +223,14 @@ g = g+xlab("Interval")+ylab("Average number of steps")   ## horizontal grid
 print(g)
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
 
 ```r
 g = g + geom_line() +facet_grid(weekend ~ .)   ## vertical grid
 print(g)
 ```
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-2.png) 
+![](PA1_template_files/figure-html/unnamed-chunk-9-2.png) 
 
 ### Activity patterns differences between weekdays and weekends
 
